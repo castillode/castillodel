@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Castillo del Año | Rifas Express</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0369a1 100%);
+      --card: rgba(255, 255, 255, 0.95);
+      --primary-blue: #0284c7;
+      --gold: #d97706;
+      --gold-light: #f59e0b;
+      --silver: #94a3b8;
+      --bronze: #b45309;
+      --red: #dc2626;
+      --green: #16a34a;
+      --text: #0f172a;
+      --current-theme: var(--gold-light);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text);
+      padding: 20px 15px 40px;
+      max-width: 820px;
+      margin: 0 auto;
+      min-height: 100vh;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ENCABEZADO Y LOGO */
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-container {
+      position: relative;
+      display: block;
+      margin: 0 auto 12px;
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .logo-container::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 4s infinite ease-in-out;
+    }
+
+    @keyframes shine {
+      0% { left: -60%; }
+      20% { left: 140%; }
+      100% { left: 140%; }
+    }
+
+    /* PESTAÑAS DE NIVELES (ORO, PLATA, BRONCE) */
+    .tabs-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 6px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      border: 2px solid transparent;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--text);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .tab-btn[data-type="oro"].active { border-color: var(--gold-light); }
+    .tab-btn[data-type="plata"].active { border-color: var(--silver); }
+    .tab-btn[data-type="bronce"].active { border-color: var(--bronze); }
+
+    .tab-price {
+      font-size: 0.75rem;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    /* TARJETAS Y PREMIOS */
+    .card {
+      background: var(--card);
+      border: 2px solid var(--current-theme);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: border-color 0.4s ease;
+    }
+
+    .prize-glow {
+      animation: prizeGlow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes prizeGlow {
+      0%, 100% { text-shadow: 0 0 5px rgba(2, 132, 199, 0.2); transform: scale(1); }
+      50% { text-shadow: 0 0 15px rgba(217, 119, 6, 0.5); transform: scale(1.02); }
+    }
+
+    .prizes-info {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 15px;
+      font-size: 0.88rem;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* BARRAS Y GRILLA */
+    .progress-box {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .progress-bar-bg {
+      background: #e2e8f0;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, var(--green), #22c55e);
+      height: 100%;
+      width: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: space-around;
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-green { background: var(--green); }
+    .dot-gold { background: var(--gold-light); }
+    .dot-red { background: var(--red); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .num {
+      background: #ffffff;
+      border: 2px solid #38bdf8;
+      color: #0369a1;
+      padding: 14px 0;
+      text-align: center;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .num:hover:not(.sold) {
+      transform: translateY(-3px) scale(1.05);
+      border-color: var(--gold-light);
+    }
+
+    .num.sel {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff;
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(217, 119, 6, 0.6);
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .num.sold {
+      background: #e2e8f0;
+      color: #94a3b8;
+      border-color: #cbd5e1;
+      cursor: not-allowed;
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .num.shake { animation: shake 0.4s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    /* BOTONES */
+    .btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gold { background: var(--gold-light); color: #fff; }
+    .btn-gold:hover { background: var(--gold); }
+
+    .btn-out {
+      background: #fff;
+      border: 2px solid var(--primary-blue);
+      color: var(--primary-blue);
+    }
+
+    /* FORMULARIO Y BOTÓN WHATSAPP */
+    input {
+      width: 100%;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      color: var(--text);
+      margin: 6px 0 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .payment-box {
+      background: #f8fafc;
+      border: 1px dashed var(--primary-blue);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-copy {
+      background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-wsp {
+      width: 100%;
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      color: #fff;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+      animation: pulseWsp 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseWsp {
+      0%, 100% { box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); transform: scale(1); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6); transform: scale(1.02); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <img src="castillo del año_20260929_131621_0000.png" alt="Logo Castillo del Año" class="logo-img" onerror="this.src='https://via.placeholder.com/480x200/0f172a/d97706?text=CASTILLO+DEL+A%C3%91O'">
+    </div>
+  </header>
+
+  <!-- PESTAÑAS DE SELECCIÓN DE SORTEO -->
+  <div class="tabs-container">
+    <button class="tab-btn active" data-type="oro" onclick="switchRaffle('oro')">
+      <span>🥇 SORTEO ORO</span>
+      <span class="tab-price">Ticket: $20.000</span>
+    </button>
+    <button class="tab-btn" data-type="plata" onclick="switchRaffle('plata')">
+      <span>🥈 SORTEO PLATA</span>
+      <span class="tab-price">Ticket: $10.000</span>
+    </button>
+    <button class="tab-btn" data-type="bronce" onclick="switchRaffle('bronce')">
+      <span>🥉 SORTEO BRONCE</span>
+      <span class="tab-price">Ticket: $5.000</span>
+    </button>
+  </div>
+
+  <div class="card" id="main-card">
+    <h2 class="prize-glow" id="prize-title" style="color: var(--primary-blue); font-size: 1.4rem;">Gran Premio: $1'000.000 COP</h2>
+    <p style="margin-top: 4px; font-size:0.95rem;" id="ticket-info">Valor Ticket: <strong>$20.000 COP</strong> | Lotería de Boyacá (Sábado)</p>
+    
+    <div class="prizes-info" id="prizes-details">
+      <!-- Los detalles se actualizan con JS -->
+    </div>
+  </div>
+
+  <div class="progress-box">
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700;">
+      <span>Boletos Disponibles</span>
+      <span id="avail-text">100 / 100</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="dot dot-green"></span> Disponible</div>
+    <div class="legend-item"><span class="dot dot-gold"></span> Seleccionado</div>
+    <div class="legend-item"><span class="dot dot-red"></span> Reservado</div>
+  </div>
+
+  <div style="display:flex; gap:10px">
+    <button class="btn btn-out" style="flex:1" onclick="selectRandom()">🎲 Número al Azar</button>
+    <button class="btn btn-gold" onclick="clearSel()">Limpiar</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="card" style="text-align:left;">
+    <label style="font-size:0.9rem; font-weight:700;">Boletos Seleccionados:</label>
+    <input id="selected" readonly placeholder="Ninguno seleccionado">
+    
+    <label style="font-size:0.9rem; font-weight:700;">Total a Pagar:</label>
+    <input id="total" readonly value="$0 COP">
+    
+    <label style="font-size:0.9rem; font-weight:700;">Tu Nombre Completo:</label>
+    <input id="name" placeholder="Escribe tu nombre aquí">
+    
+    <div class="payment-box">
+      <div>
+        <p style="font-size:.85rem; margin:0">💳 <strong>Pago Nequi / Daviplata:</strong></p>
+        <span style="font-weight:700; color:var(--primary-blue);" id="phone-num">311 521 5251</span>
+      </div>
+      <button class="btn-copy" onclick="copyPhone()">📋 Copiar</button>
+    </div>
+
+    <button class="btn-wsp" onclick="sendWsp()">📲 Reservar por WhatsApp</button>
+  </div>
+
+  <script>
+    const raffles = {
+      oro: {
+        title: "🥇 Sorteo Oro: $1'000.000 COP",
+        ticketPrice: 20000,
+        themeColor: "#f59e0b",
+        prizes: `
+          <div>🥇 <strong>Primer Premio:</strong> $1'000.000 COP (2 últimas cifras del Premio Mayor)</div>
+          <div>🥈 <strong>Segundo Premio:</strong> $100.000 COP (Número anterior al ganador)</div>
+          <div>🥉 <strong>Tercer Premio:</strong> $100.000 COP (Número posterior al ganador)</div>
+          <div>🎖️ <strong>Cuarto Premio:</strong> $50.000 COP (Número invertido / espejo)</div>
+        `,
+        sold: [],
+        sel: []
+      },
+      plata: {
+        title: "🥈 Sorteo Plata: $500.000 COP",
+        ticketPrice: 10000,
+        themeColor: "#94a3b8",
+        prizes: `
+          <div>🥇 <strong>Primer Premio:</strong> $500.000 COP (2 últimas cifras del Premio Mayor)</div>
+          <div>🥈 <strong>Segundo Premio:</strong> $50.000 COP (Número anterior al ganador)</div>
+          <div>🥉 <strong>Tercer Premio:</strong> $50.000 COP (Número posterior al ganador)</div>
+          <div>🎖️ <strong>Cuarto Premio:</strong> $25.000 COP (Número invertido / espejo)</div>
+        `,
+        sold: [],
+        sel: []
+      },
+      bronce: {
+        title: "🥉 Sorteo Bronce: $250.000 COP",
+        ticketPrice: 5000,
+        themeColor: "#b45309",
+        prizes: `
+          <div>🥇 <strong>Primer Premio:</strong> $250.000 COP (2 últimas cifras del Premio Mayor)</div>
+          <div>🥈 <strong>Segundo Premio:</strong> $25.000 COP (Número anterior al ganador)</div>
+          <div>🥉 <strong>Tercer Premio:</strong> $25.000 COP (Número posterior al ganador)</div>
+          <div>🎖️ <strong>Cuarto Premio:</strong> $12.500 COP (Número invertido / espejo)</div>
+        `,
+        sold: [],
+        sel: []
+      }
+    };
+
+    let currentRaffle = 'oro';
+
+    function switchRaffle(type) {
+      currentRaffle = type;
+      
+      // Actualizar pestañas activas
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === type);
+      });
+
+      // Actualizar información del sorteo
+      const data = raffles[type];
+      document.getElementById('prize-title').innerText = data.title;
+      document.getElementById('ticket-info').innerHTML = `Valor Ticket: <strong>$${data.ticketPrice.toLocaleString('es-CO')} COP</strong> | Lotería de Boyacá (Sábado)`;
+      document.getElementById('prizes-details').innerHTML = data.prizes;
+      document.documentElement.style.setProperty('--current-theme', data.themeColor);
+
+      renderGrid();
+      update();
+    }
+
+    const grid = document.getElementById('grid');
+
+    function renderGrid() {
+      grid.innerHTML = '';
+      const data = raffles[currentRaffle];
+
+      for (let i = 0; i < 100; i++) {
+        const n = i.toString().padStart(2, '0');
+        const b = document.createElement('div');
+
+        if (data.sold.includes(n)) {
+          b.className = 'num sold';
+          b.innerText = n;
+          b.onclick = () => {
+            b.classList.remove('shake');
+            void b.offsetWidth;
+            b.classList.add('shake');
+          };
+        } else {
+          b.className = 'num' + (data.sel.includes(n) ? ' sel' : '');
+          b.innerText = n;
+          b.onclick = () => toggleSelect(n);
+        }
+        grid.appendChild(b);
+      }
+      updateStats();
+    }
+
+    function toggleSelect(n) {
+      const data = raffles[currentRaffle];
+      if (data.sel.includes(n)) {
+        data.sel = data.sel.filter(x => x !== n);
+      } else {
+        data.sel.push(n);
+      }
+      renderGrid();
+      update();
+    }
+
+    const update = () => {
+      const data = raffles[currentRaffle];
+      document.getElementById('selected').value = data.sel.length ? data.sel.join(', ') : 'Ninguno';
+      document.getElementById('total').value = `$${(data.sel.length * data.ticketPrice).toLocaleString('es-CO')} COP`;
+    };
+
+    const updateStats = () => {
+      const data = raffles[currentRaffle];
+      const available = 100 - data.sold.length;
+      document.getElementById('avail-text').innerText = `${available} / 100`;
+      document.getElementById('progress-bar').style.width = `${available}%`;
+    };
+
+    const selectRandom = () => {
+      const available = Array.from(grid.children).filter(el => !el.classList.contains('sold') && !el.classList.contains('sel'));
+      if (available.length) {
+        const randomEl = available[Math.floor(Math.random() * available.length)];
+        toggleSelect(randomEl.innerText);
+      } else {
+        alert('No hay más números disponibles en este sorteo.');
+      }
+    };
+
+    const clearSel = () => { 
+      raffles[currentRaffle].sel = []; 
+      renderGrid(); 
+      update(); 
+    };
+
+    function copyPhone() {
+      navigator.clipboard.writeText('3115215251');
+      alert('¡Número 311 521 5251 copiado al portapapeles!');
+    }
+
+    function sendWsp() {
+      const name = document.getElementById('name').value.trim();
+      const data = raffles[currentRaffle];
+
+      if (!name || !data.sel.length) {
+        return alert('Por favor selecciona al menos un número e ingresa tu nombre.');
+      }
+
+      const categoryName = currentRaffle.toUpperCase();
+      const msg = `Hola Castillo del Año! 👋🏼%0AQuiero reservar para el *SORTEO ${categoryName}*%0ANombre: *${name}*%0ABoletos reservados: *${data.sel.join(', ')}*%0ATotal a pagar: *$${(data.sel.length * data.ticketPrice).toLocaleString('es-CO')} COP*`;
+      window.open(`https://wa.me/573115215251?text=${msg}`, '_blank');
+    }
+
+    // Inicializar sorteo
+    switchRaffle('oro');
+  </script>
+</body>
+</html>
