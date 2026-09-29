@@ -435,4 +435,91 @@
     renderGrid();
   </script>
 </body>
+</html>>
+
+    <button class="btn-wsp" onclick="sendWsp()">📲 Reservar por WhatsApp</button>
+  </div>
+
+  <script>
+    const price = 20000; 
+    let sel = [];
+    const soldNumbers = []; 
+
+    const grid = document.getElementById('grid');
+
+    function renderGrid() {
+      grid.innerHTML = '';
+      for (let i = 0; i < 100; i++) {
+        const n = i.toString().padStart(2, '0');
+        const b = document.createElement('div');
+
+        if (soldNumbers.includes(n)) {
+          b.className = 'num sold';
+          b.innerText = n;
+          b.title = 'No disponible';
+        } else {
+          b.className = 'num' + (sel.includes(n) ? ' sel' : '');
+          b.innerText = n;
+          b.onclick = () => toggleSelect(n);
+        }
+        grid.appendChild(b);
+      }
+      updateStats();
+    }
+
+    function toggleSelect(n) {
+      if (sel.includes(n)) {
+        sel = sel.filter(x => x !== n);
+      } else {
+        sel.push(n);
+      }
+      renderGrid();
+      update();
+    }
+
+    const update = () => {
+      document.getElementById('selected').value = sel.length ? sel.join(', ') : 'Ninguno';
+      document.getElementById('total').value = `$${(sel.length * price).toLocaleString('es-CO')} COP`;
+    };
+
+    const updateStats = () => {
+      const available = 100 - soldNumbers.length;
+      document.getElementById('avail-text').innerText = `${available} / 100`;
+      const percentage = (available / 100) * 100;
+      document.getElementById('progress-bar').style.width = `${percentage}%`;
+    };
+
+    const selectRandom = () => {
+      const available = Array.from(grid.children).filter(el => !el.classList.contains('sold') && !el.classList.contains('sel'));
+      if (available.length) {
+        const randomEl = available[Math.floor(Math.random() * available.length)];
+        toggleSelect(randomEl.innerText);
+      } else {
+        alert('No hay más números disponibles para seleccionar.');
+      }
+    };
+
+    const clearSel = () => { 
+      sel = []; 
+      renderGrid(); 
+      update(); 
+    };
+
+    function copyPhone() {
+      navigator.clipboard.writeText('3115215251');
+      alert('¡Número 311 521 5251 copiado al portapapeles!');
+    }
+
+    function sendWsp() {
+      const name = document.getElementById('name').value.trim();
+      if (!name || !sel.length) {
+        return alert('Por favor selecciona al menos un número e ingresa tu nombre.');
+      }
+      const msg = `Hola Castillo del Año! 👋🏼%0ANombre: *${name}*%0ABoletos reservados: *${sel.join(', ')}*%0ATotal: *$${(sel.length * price).toLocaleString('es-CO')} COP*`;
+      window.open(`https://wa.me/573115215251?text=${msg}`, '_blank');
+    }
+
+    renderGrid();
+  </script>
+</body>
 </html>
