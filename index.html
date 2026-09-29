@@ -29,55 +29,46 @@
       min-height: 100vh;
     }
 
-    /* ENCABEZADO Y LOGO DESTACADO */
+    /* ENCABEZADO CON LOGO RECTANGULAR DESTACADO */
     header {
       text-align: center;
       margin-bottom: 25px;
-      position: relative;
+      padding: 10px 0;
     }
 
     .logo-container {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 12px;
+      display: block;
+      margin: 0 auto 15px;
+      width: 100%;
+      max-width: 480px; /* Ocupa un mayor espacio del contenedor azul */
     }
 
     .logo-img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: 4px solid var(--gold-light);
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.5), 0 8px 20px rgba(0,0,0,0.3);
-      object-fit: cover;
-      animation: pulse-glow 3s infinite ease-in-out;
-      background: #0f172a;
-    }
-
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4), 0 8px 20px rgba(0,0,0,0.3); }
-      50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.8), 0 8px 25px rgba(0,0,0,0.4); }
-    }
-
-    h1 {
-      font-family: 'Cinzel', serif;
-      color: #ffffff;
-      letter-spacing: 3px;
-      font-size: 2rem;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      width: 100%;
+      height: auto;
+      border-radius: 12px; /* Esquinas sutilmente redondeadas */
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      display: block;
+      margin: 0 auto;
     }
 
     .subtitle {
       color: #e2e8f0;
-      font-size: 0.95rem;
-      margin-top: 4px;
+      font-size: 1.1rem;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .badge {
       background: linear-gradient(45deg, #dc2626, #ef4444);
       color: #fff;
-      padding: 4px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 700;
       display: inline-block;
       box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
@@ -297,11 +288,12 @@
 
   <header>
     <div class="logo-container">
-      <!-- Ruta directa a tu logo en la raíz del repositorio -->
-      <img src="castillo del año_20260929_131621_0000.png" alt="Logo Castillo del Año" class="logo-img" onerror="this.src='https://via.placeholder.com/120/0284c7/ffffff?text=CASTILLO'">
+      <img src="castillo del año_20260929_131621_0000.png" alt="Logo Castillo del Año" class="logo-img" onerror="this.src='https://via.placeholder.com/480x200/0f172a/d97706?text=CASTILLO+DEL+A%C3%91O'">
     </div>
-    <h1>CASTILLO DEL AÑO</h1>
-    <p class="subtitle"><strong style="color:var(--gold-light)">Rifas Express</strong> <span class="badge">⚡ Sorteos Rápidos</span></p>
+    <p class="subtitle">
+      <strong style="color:var(--gold-light); font-size:1.2rem;">Rifas Express</strong> 
+      <span class="badge">⚡ Sorteos Rápidos</span>
+    </p>
   </header>
 
   <div class="card">
@@ -364,7 +356,6 @@
   <script>
     const price = 20000; 
     let sel = [];
-    // Agrega aquí los números vendidos entre comillas. Ej: ['05', '12', '88']
     const soldNumbers = []; 
 
     const grid = document.getElementById('grid');
@@ -441,7 +432,6 @@
       window.open(`https://wa.me/573115215251?text=${msg}`, '_blank');
     }
 
-    // Inicializar al cargar
     renderGrid();
   </script>
 </body>
