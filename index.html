@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Castillo del Año | Rifas Express</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0369a1 100%);
+      --card: rgba(255, 255, 255, 0.95);
+      --primary-blue: #0284c7;
+      --gold: #d97706;
+      --gold-light: #f59e0b;
+      --red: #dc2626;
+      --green: #16a34a;
+      --text: #0f172a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text);
+      padding: 20px 15px 40px;
+      max-width: 820px;
+      margin: 0 auto;
+      min-height: 100vh;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ENCABEZADO Y LOGO CON DESTELLO DE LUZ */
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+      padding: 10px 0;
+    }
+
+    .logo-container {
+      position: relative;
+      display: block;
+      margin: 0 auto 15px;
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .logo-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* Efecto de luz pasando sobre el logo */
+    .logo-container::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 4s infinite ease-in-out;
+    }
+
+    @keyframes shine {
+      0% { left: -60%; }
+      20% { left: 140%; }
+      100% { left: 140%; }
+    }
+
+    .subtitle {
+      color: #e2e8f0;
+      font-size: 1.1rem;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: linear-gradient(45deg, #dc2626, #ef4444);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: inline-block;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-5px); }
+      60% { transform: translateY(-3px); }
+    }
+
+    /* TARJETAS PRINCIPALES Y PREMIO PULSANTE */
+    .card {
+      background: var(--card);
+      border: 2px solid var(--gold-light);
+      border-radius: 16px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      backdrop-filter: blur(8px);
+      transition: transform 0.3s ease;
+    }
+
+    .prize-glow {
+      animation: prizeGlow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes prizeGlow {
+      0%, 100% { text-shadow: 0 0 5px rgba(2, 132, 199, 0.2); transform: scale(1); }
+      50% { text-shadow: 0 0 15px rgba(217, 119, 6, 0.6); transform: scale(1.02); }
+    }
+
+    .prizes-info {
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    /* BARRAS DE PROGRESO / ESTADO */
+    .progress-box {
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .progress-bar-bg {
+      background: #e2e8f0;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-bar-fill {
+      background: linear-gradient(90deg, var(--green), #22c55e);
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: space-around;
+      background: #ffffff;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .dot-green { background: var(--green); }
+    .dot-gold { background: var(--gold-light); }
+    .dot-red { background: var(--red); }
+
+    /* GRILLA DE NÚMEROS ANIMADA */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .num {
+      background: #ffffff;
+      border: 2px solid #38bdf8;
+      color: #0369a1;
+      padding: 14px 0;
+      text-align: center;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .num:hover:not(.sold) {
+      transform: translateY(-3px) scale(1.05);
+      border-color: var(--gold-light);
+      box-shadow: 0 5px 12px rgba(2, 132, 199, 0.25);
+    }
+
+    .num:active:not(.sold) {
+      transform: scale(0.95);
+    }
+
+    .num.sel {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff;
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(217, 119, 6, 0.6);
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    .num.sold {
+      background: #e2e8f0;
+      color: #94a3b8;
+      border-color: #cbd5e1;
+      cursor: not-allowed;
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    /* Animación de vibración para números no disponibles */
+    .num.shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    /* BOTONES */
+    .btn {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gold { background: var(--gold-light); color: #fff; }
+    .btn-gold:hover { background: var(--gold); transform: translateY(-2px); }
+
+    .btn-out {
+      background: #fff;
+      border: 2px solid var(--primary-blue);
+      color: var(--primary-blue);
+    }
+    .btn-out:hover { background: #f0f9ff; transform: translateY(-2px); }
+
+    /* FORMULARIO Y PAGO */
+    input {
+      width: 100%;
+      padding: 12px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      color: var(--text);
+      margin: 6px 0 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+    }
+
+    .payment-box {
+      background: #f8fafc;
+      border: 1px dashed var(--primary-blue);
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-copy {
+      background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Botón de WhatsApp animado */
+    .btn-wsp {
+      width: 100%;
+      background: linear-gradient(135deg, #25d366, #128c7e);
+      color: #fff;
+      padding: 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+      transition: all 0.2s ease;
+      animation: pulseWsp 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseWsp {
+      0%, 100% { box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); transform: scale(1); }
+      50% { box-shadow: 0 8px 25px rgba(37, 211, 102, 0.6); transform: scale(1.02); }
+    }
+
+    .btn-wsp:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <img src="castillo del año_20260929_131621_0000.png" alt="Logo Castillo del Año" class="logo-img" onerror="this.src='https://via.placeholder.com/480x200/0f172a/d97706?text=CASTILLO+DEL+A%C3%91O'">
+    </div>
+    <p class="subtitle">
+      <strong style="color:var(--gold-light); font-size:1.2rem;">Rifas Express</strong> 
+      <span class="badge">⚡ Sorteos Rápidos</span>
+    </p>
+  </header>
+
+  <div class="card">
+    <h2 class="prize-glow" style="color: var(--primary-blue); font-size: 1.4rem;">Gran Premio: $1'000.000 COP</h2>
+    <p style="margin-top: 4px; font-size:0.95rem;">Valor Ticket: <strong>$20.000 COP</strong> | Lotería de Boyacá (Sábado)</p>
+    
+    <div class="prizes-info">
+      <div>🥇 <strong>Primer Premio:</strong> $1'000.000 COP (2 últimas cifras del Premio Mayor)</div>
+      <div>🥈 <strong>Segundo Premio:</strong> $100.000 COP (Número anterior al ganador)</div>
+      <div>🥉 <strong>Tercer Premio:</strong> $100.000 COP (Número posterior al ganador)</div>
+      <div>🎖️ <strong>Cuarto Premio:</strong> $50.000 COP (Número invertido / espejo)</div>
+    </div>
+  </div>
+
+  <!-- BARRA DE DISPONIBILIDAD -->
+  <div class="progress-box">
+    <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700;">
+      <span>Boletos Disponibles</span>
+      <span id="avail-text">100 / 100</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="dot dot-green"></span> Disponible</div>
+    <div class="legend-item"><span class="dot dot-gold"></span> Seleccionado</div>
+    <div class="legend-item"><span class="dot dot-red"></span> Reservado</div>
+  </div>
+
+  <div style="display:flex; gap:10px">
+    <button class="btn btn-out" style="flex:1" onclick="selectRandom()">🎲 Número al Azar</button>
+    <button class="btn btn-gold" onclick="clearSel()">Limpiar</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="card" style="text-align:left;">
+    <label style="font-size:0.9rem; font-weight:700;">Boletos Seleccionados:</label>
+    <input id="selected" readonly placeholder="Ninguno seleccionado">
+    
+    <label style="font-size:0.9rem; font-weight:700;">Total a Pagar:</label>
+    <input id="total" readonly value="$0 COP">
+    
+    <label style="font-size:0.9rem; font-weight:700;">Tu Nombre Completo:</label>
+    <input id="name" placeholder="Escribe tu nombre aquí">
+    
+    <div class="payment-box">
+      <div>
+        <p style="font-size:.85rem; margin:0">💳 <strong>Pago Nequi / Daviplata:</strong></p>
+        <span style="font-weight:700; color:var(--primary-blue);" id="phone-num">311 521 5251</span>
+      </div>
+      <button class="btn-copy" onclick="copyPhone()">📋 Copiar</button>
+    </div>
+
+    <button class="btn-wsp" onclick="sendWsp()">📲 Reservar por WhatsApp</button>
+  </div>
+
+  <script>
+    const price = 20000; 
+    let sel = [];
+    const soldNumbers = []; 
+
+    const grid = document.getElementById('grid');
+
+    function renderGrid() {
+      grid.innerHTML = '';
+      for (let i = 0; i < 100; i++) {
+        const n = i.toString().padStart(2, '0');
+        const b = document.createElement('div');
+
+        if (soldNumbers.includes(n)) {
+          b.className = 'num sold';
+          b.innerText = n;
+          b.title = 'No disponible';
+          b.onclick = () => {
+            b.classList.remove('shake');
+            void b.offsetWidth;
+            b.classList.add('shake');
+          };
+        } else {
+          b.className = 'num' + (sel.includes(n) ? ' sel' : '');
+          b.innerText = n;
+          b.onclick = () => toggleSelect(n);
+        }
+        grid.appendChild(b);
+      }
+      updateStats();
+    }
+
+    function toggleSelect(n) {
+      if (sel.includes(n)) {
+        sel = sel.filter(x => x !== n);
+      } else {
+        sel.push(n);
+      }
+      renderGrid();
+      update();
+    }
+
+    const update = () => {
+      document.getElementById('selected').value = sel.length ? sel.join(', ') : 'Ninguno';
+      document.getElementById('total').value = `$${(sel.length * price).toLocaleString('es-CO')} COP`;
+    };
+
+    const updateStats = () => {
+      const available = 100 - soldNumbers.length;
+      document.getElementById('avail-text').innerText = `${available} / 100`;
+      const percentage = (available / 100) * 100;
+      document.getElementById('progress-bar').style.width = `${percentage}%`;
+    };
+
+    const selectRandom = () => {
+      const available = Array.from(grid.children).filter(el => !el.classList.contains('sold') && !el.classList.contains('sel'));
+      if (available.length) {
+        const randomEl = available[Math.floor(Math.random() * available.length)];
+        toggleSelect(randomEl.innerText);
+      } else {
+        alert('No hay más números disponibles para seleccionar.');
+      }
+    };
+
+    const clearSel = () => { 
+      sel = []; 
+      renderGrid(); 
+      update(); 
+    };
+
+    function copyPhone() {
+      navigator.clipboard.writeText('3115215251');
+      alert('¡Número 311 521 5251 copiado al portapapeles!');
+    }
+
+    function sendWsp() {
+      const name = document.getElementById('name').value.trim();
+      if (!name || !sel.length) {
+        return alert('Por favor selecciona al menos un número e ingresa tu nombre.');
+      }
+      const msg = `Hola Castillo del Año! 👋🏼%0ANombre: *${name}*%0ABoletos reservados: *${sel.join(', ')}*%0ATotal: *$${(sel.length * price).toLocaleString('es-CO')} COP*`;
+      window.open(`https://wa.me/573115215251?text=${msg}`, '_blank');
+    }
+
+    renderGrid();
+  </script>
+</body>
+</html>
