@@ -288,7 +288,8 @@
     .num.roulette-highlight {
       background: var(--current-theme) !important;
       color: #fff !important;
-      transform: scale(1.1);
+      transform: scale(1.15);
+      box-shadow: 0 0 15px var(--current-theme);
     }
 
     /* BOTONES */
@@ -430,7 +431,7 @@
   </div>
 
   <div style="display:flex; gap:10px">
-    <button class="btn btn-out" style="flex:1" onclick="selectRandom()">🎲 Número al Azar</button>
+    <button class="btn btn-out" style="flex:1" id="btn-random" onclick="selectRandom()">🎲 Número al Azar</button>
     <button class="btn btn-gold" onclick="clearSel()">Limpiar</button>
   </div>
 
@@ -461,11 +462,20 @@
     // --- SINTETIZADOR DE EFECTOS DE SONIDO (WEB AUDIO API) ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
+    let logoShineInterval = null;
 
     function initAudio() {
-      if (!audioCtx) audioCtx = new AudioContext();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+        startLogoShineLoop();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
     }
+
+    window.addEventListener('click', initAudio, { once: true });
+    window.addEventListener('touchstart', initAudio, { once: true });
 
     // 1. Sonido de Dado / Clic de Ruleta
     function playDiceSound() {
@@ -474,30 +484,39 @@
       const gain = audioCtx.createGain();
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(180 + Math.random() * 120, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.04);
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start();
-      osc.stop(audioCtx.currentTime + 0.04);
+      osc.stop(audioCtx.currentTime + 0.05);
     }
 
-    // 2. Sonido Mágico / Destello (al cambiar de nivel)
+    // 2. Sonido Mágico / Destello
     function playShineSound() {
-      initAudio();
+      if (!audioCtx) return;
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(523.25, now); // Nota C5
-      osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.25); // Nota C6
+      osc.frequency.setValueAtTime(523.25, now); // C5
+      osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.25); // C6
       gain.gain.setValueAtTime(0.15, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.25);
+    }
+
+    function startLogoShineLoop() {
+      if (!logoShineInterval) {
+        playShineSound();
+        logoShineInterval = setInterval(() => {
+          playShineSound();
+        }, 5000);
+      }
     }
 
     // 3. Sonido Clic / Selección de Número
@@ -525,13 +544,13 @@
       const gain = audioCtx.createGain();
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(587.33, now); // D5
-      osc.frequency.setValueAtTime(880, now + 0.1); // A5
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      osc.frequency.setValueAtTime(880, now + 0.12); // A5
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start(now);
-      osc.stop(now + 0.3);
+      osc.stop(now + 0.35);
     }
 
 
@@ -592,30 +611,25 @@
     function switchRaffle(type) {
       currentRaffle = type;
       
-      // Sonido de destello al cambiar
       playShineSound();
 
-      // Actualizar pestañas activas
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.type === type);
       });
 
-      // Disparar animación de cambio en tarjetas
       const card = document.getElementById('main-card');
       const gridEl = document.getElementById('grid');
       card.classList.remove('tab-switch-anim');
       gridEl.classList.remove('tab-switch-anim');
-      void card.offsetWidth; // Reflow
+      void card.offsetWidth;
       card.classList.add('tab-switch-anim');
       gridEl.classList.add('tab-switch-anim');
 
-      // Actualizar información y temas cromáticos del sorteo
       const data = raffles[type];
       document.getElementById('prize-title').innerText = data.title;
       document.getElementById('ticket-info').innerHTML = `Valor Ticket: <strong>$${data.ticketPrice.toLocaleString('es-CO')} COP</strong> | Lotería de Boyacá (Sábado)`;
       document.getElementById('prizes-details').innerHTML = data.prizes;
 
-      // Variables CSS globales
       document.documentElement.style.setProperty('--current-theme', data.themeColor);
       document.documentElement.style.setProperty('--current-border', data.borderColor);
       document.documentElement.style.setProperty('--current-bg-prizes', data.bgPrizes);
@@ -680,34 +694,49 @@
       document.getElementById('progress-bar').style.width = `${available}%`;
     };
 
-    /* Animación e iteración de sonido para selección al azar (Efecto Dado / Ruleta) */
+    /* --- RUGLA CON DESACELERACIÓN PROGRESIVA PARA GENERAR SUSPENSO --- */
+    let isRolling = false;
+
     const selectRandom = () => {
-      const available = Array.from(grid.children).filter(el => !el.classList.contains('sold') && !el.classList.contains('sel'));
+      if (isRolling) return;
       
+      const available = Array.from(grid.children).filter(el => !el.classList.contains('sold') && !el.classList.contains('sel'));
       if (!available.length) {
         return alert('No hay más números disponibles en este sorteo.');
       }
 
-      let count = 0;
-      const maxSteps = 10;
-      const interval = setInterval(() => {
+      isRolling = true;
+      const btnRandom = document.getElementById('btn-random');
+      btnRandom.disabled = true;
+
+      // Secuencia de tiempos (en ms) para frenado progresivo
+      const delays = [70, 70, 80, 90, 110, 140, 180, 230, 290, 360, 450];
+      let step = 0;
+
+      function stepSpin() {
         available.forEach(el => el.classList.remove('roulette-highlight'));
         const tempRandom = available[Math.floor(Math.random() * available.length)];
         tempRandom.classList.add('roulette-highlight');
         
-        // Sonido de rodar dado/ruleta por cada salto
         playDiceSound();
-        
-        count++;
 
-        if (count >= maxSteps) {
-          clearInterval(interval);
-          available.forEach(el => el.classList.remove('roulette-highlight'));
-          const finalEl = available[Math.floor(Math.random() * available.length)];
-          playSuccessSound();
-          toggleSelect(finalEl.innerText);
+        step++;
+        if (step < delays.length) {
+          setTimeout(stepSpin, delays[step]);
+        } else {
+          // Final de la ruleta
+          setTimeout(() => {
+            available.forEach(el => el.classList.remove('roulette-highlight'));
+            const finalEl = available[Math.floor(Math.random() * available.length)];
+            playSuccessSound();
+            toggleSelect(finalEl.innerText);
+            isRolling = false;
+            btnRandom.disabled = false;
+          }, delays[delays.length - 1]);
         }
-      }, 70);
+      }
+
+      stepSpin();
     };
 
     const clearSel = () => { 
@@ -716,7 +745,6 @@
       update(); 
     };
 
-    /* Función copiar con feedback visual y de sonido */
     function copyPhone() {
       playSuccessSound();
       navigator.clipboard.writeText('3115215251');
@@ -742,7 +770,6 @@
       const categoryName = currentRaffle.toUpperCase();
       const msg = `Hola Castillo del Año! 👋🏼%0AQuiero reservar para el *SORTEO ${categoryName}*%0ANombre: *${name}*%0ABoletos reservados: *${data.sel.join(', ')}*%0ATotal a pagar: *$${(data.sel.length * data.ticketPrice).toLocaleString('es-CO')} COP*`;
       
-      // WhatsApp principal 350 593 3518
       window.open(`https://wa.me/573505933518?text=${msg}`, '_blank');
     }
 
