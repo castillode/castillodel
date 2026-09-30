@@ -462,18 +462,17 @@
     // --- SINTETIZADOR DE EFECTOS DE SONIDO (WEB AUDIO API) ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
-    let logoShineInterval = null;
 
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new AudioContext();
-        startLogoShineLoop();
       }
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
     }
 
+    // Activar contexto de audio al interactuar
     window.addEventListener('click', initAudio, { once: true });
     window.addEventListener('touchstart', initAudio, { once: true });
 
@@ -493,9 +492,9 @@
       osc.stop(audioCtx.currentTime + 0.05);
     }
 
-    // 2. Sonido Mágico / Destello
+    // 2. Sonido Mágico / Cambio de Talonario
     function playShineSound() {
-      if (!audioCtx) return;
+      initAudio();
       const now = audioCtx.currentTime;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -508,15 +507,6 @@
       gain.connect(audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.25);
-    }
-
-    function startLogoShineLoop() {
-      if (!logoShineInterval) {
-        playShineSound();
-        logoShineInterval = setInterval(() => {
-          playShineSound();
-        }, 5000);
-      }
     }
 
     // 3. Sonido Clic / Selección de Número
@@ -694,7 +684,7 @@
       document.getElementById('progress-bar').style.width = `${available}%`;
     };
 
-    /* --- RUGLA CON DESACELERACIÓN PROGRESIVA PARA GENERAR SUSPENSO --- */
+    /* --- RULETA CON DESACELERACIÓN PROGRESIVA --- */
     let isRolling = false;
 
     const selectRandom = () => {
@@ -709,7 +699,6 @@
       const btnRandom = document.getElementById('btn-random');
       btnRandom.disabled = true;
 
-      // Secuencia de tiempos (en ms) para frenado progresivo
       const delays = [70, 70, 80, 90, 110, 140, 180, 230, 290, 360, 450];
       let step = 0;
 
@@ -724,7 +713,6 @@
         if (step < delays.length) {
           setTimeout(stepSpin, delays[step]);
         } else {
-          // Final de la ruleta
           setTimeout(() => {
             available.forEach(el => el.classList.remove('roulette-highlight'));
             const finalEl = available[Math.floor(Math.random() * available.length)];
