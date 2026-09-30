@@ -45,7 +45,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ENCABEZADO Y LOGO */
+    /* ENCABEZADO Y LOGO CON DESTELLO CADA 5s */
     header {
       text-align: center;
       margin-bottom: 20px;
@@ -82,7 +82,7 @@
         rgba(255, 255, 255, 0) 100%
       );
       transform: rotate(30deg);
-      animation: shine 4s infinite ease-in-out;
+      animation: shine 5s infinite ease-in-out;
     }
 
     @keyframes shine {
@@ -135,7 +135,7 @@
       opacity: 0.9;
     }
 
-    /* TARJETAS Y PREMIOS CON COLORES TEMÁTICOS */
+    /* TARJETAS Y PREMIOS CON COLORES Y ANIMACIÓN DE CAMBIO */
     .card {
       background: var(--card);
       border: 3px solid var(--current-border);
@@ -144,7 +144,25 @@
       text-align: center;
       margin-bottom: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      transition: all 0.4s ease;
+      transition: border-color 0.4s ease;
+    }
+
+    /* Animación de destello al alternar pestañas */
+    .tab-switch-anim {
+      animation: tabFlash 0.4s ease-out;
+    }
+
+    @keyframes tabFlash {
+      0% {
+        opacity: 0.4;
+        transform: translateY(6px);
+        box-shadow: 0 0 25px var(--current-theme);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      }
     }
 
     .prize-glow {
@@ -267,6 +285,13 @@
       40%, 80% { transform: translateX(5px); }
     }
 
+    /* Animación ruleta para selección al azar */
+    .num.roulette-highlight {
+      background: var(--current-theme) !important;
+      color: #fff !important;
+      transform: scale(1.1);
+    }
+
     /* BOTONES */
     .btn {
       padding: 12px 18px;
@@ -280,15 +305,19 @@
     .btn-gold { 
       background: var(--current-theme); 
       color: #fff; 
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
-    .btn-gold:hover { opacity: 0.9; }
+    .btn-gold:hover { opacity: 0.9; transform: translateY(-2px); }
 
     .btn-out {
       background: #fff;
       border: 2px solid var(--current-border);
       color: var(--current-border);
       transition: all 0.3s ease;
+    }
+    .btn-out:hover {
+      background: #f8fafc;
+      transform: translateY(-2px);
     }
 
     /* FORMULARIO Y BOTÓN WHATSAPP */
@@ -325,6 +354,11 @@
       font-size: 0.8rem;
       cursor: pointer;
       font-weight: 600;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .btn-copy.copied {
+      background: var(--green) !important;
+      transform: scale(1.05);
     }
 
     .btn-wsp {
@@ -418,7 +452,7 @@
         <p style="font-size:.85rem; margin:0">💳 <strong>Pago Nequi / Daviplata:</strong></p>
         <span style="font-weight:700; color:var(--primary-blue);" id="phone-num">311 521 5251</span>
       </div>
-      <button class="btn-copy" onclick="copyPhone()">📋 Copiar</button>
+      <button class="btn-copy" id="btn-copy-el" onclick="copyPhone()">📋 Copiar</button>
     </div>
 
     <button class="btn-wsp" onclick="sendWsp()">📲 Reservar por WhatsApp</button>
@@ -485,6 +519,15 @@
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.type === type);
       });
+
+      // Disparar animación de cambio en tarjetas
+      const card = document.getElementById('main-card');
+      const gridEl = document.getElementById('grid');
+      card.classList.remove('tab-switch-anim');
+      gridEl.classList.remove('tab-switch-anim');
+      void card.offsetWidth; // Reflow
+      card.classList.add('tab-switch-anim');
+      gridEl.classList.add('tab-switch-anim');
 
       // Actualizar información y temas cromáticos del sorteo
       const data = raffles[type];
@@ -554,14 +597,29 @@
       document.getElementById('progress-bar').style.width = `${available}%`;
     };
 
+    /* Animación ruleta para seleccionar número al azar */
     const selectRandom = () => {
       const available = Array.from(grid.children).filter(el => !el.classList.contains('sold') && !el.classList.contains('sel'));
-      if (available.length) {
-        const randomEl = available[Math.floor(Math.random() * available.length)];
-        toggleSelect(randomEl.innerText);
-      } else {
-        alert('No hay más números disponibles en este sorteo.');
+      
+      if (!available.length) {
+        return alert('No hay más números disponibles en este sorteo.');
       }
+
+      let count = 0;
+      const maxSteps = 8;
+      const interval = setInterval(() => {
+        available.forEach(el => el.classList.remove('roulette-highlight'));
+        const tempRandom = available[Math.floor(Math.random() * available.length)];
+        tempRandom.classList.add('roulette-highlight');
+        count++;
+
+        if (count >= maxSteps) {
+          clearInterval(interval);
+          available.forEach(el => el.classList.remove('roulette-highlight'));
+          const finalEl = available[Math.floor(Math.random() * available.length)];
+          toggleSelect(finalEl.innerText);
+        }
+      }, 70);
     };
 
     const clearSel = () => { 
@@ -570,9 +628,17 @@
       update(); 
     };
 
+    /* Función copiar con feedback visual */
     function copyPhone() {
       navigator.clipboard.writeText('3115215251');
-      alert('¡Número 311 521 5251 copiado al portapapeles!');
+      const copyBtn = document.getElementById('btn-copy-el');
+      copyBtn.innerText = '✓ ¡Copiado!';
+      copyBtn.classList.add('copied');
+      
+      setTimeout(() => {
+        copyBtn.innerText = '📋 Copiar';
+        copyBtn.classList.remove('copied');
+      }, 2000);
     }
 
     function sendWsp() {
@@ -586,7 +652,7 @@
       const categoryName = currentRaffle.toUpperCase();
       const msg = `Hola Castillo del Año! 👋🏼%0AQuiero reservar para el *SORTEO ${categoryName}*%0ANombre: *${name}*%0ABoletos reservados: *${data.sel.join(', ')}*%0ATotal a pagar: *$${(data.sel.length * data.ticketPrice).toLocaleString('es-CO')} COP*`;
       
-      // WhatsApp 350 593 3518
+      // WhatsApp principal 350 593 3518
       window.open(`https://wa.me/573505933518?text=${msg}`, '_blank');
     }
 
