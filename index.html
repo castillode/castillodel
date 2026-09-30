@@ -14,11 +14,18 @@
       --gold: #d97706;
       --gold-light: #f59e0b;
       --silver: #94a3b8;
+      --silver-dark: #475569;
       --bronze: #b45309;
+      --bronze-dark: #78350f;
       --red: #dc2626;
       --green: #16a34a;
       --text: #0f172a;
+
+      /* Variables dinámicas por tema */
       --current-theme: var(--gold-light);
+      --current-border: var(--gold);
+      --current-bg-prizes: #fffbe3;
+      --current-border-prizes: #fde68a;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
@@ -128,36 +135,39 @@
       opacity: 0.9;
     }
 
-    /* TARJETAS Y PREMIOS */
+    /* TARJETAS Y PREMIOS CON COLORES TEMÁTICOS */
     .card {
       background: var(--card);
-      border: 2px solid var(--current-theme);
+      border: 3px solid var(--current-border);
       border-radius: 16px;
       padding: 20px;
       text-align: center;
       margin-bottom: 20px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      transition: border-color 0.4s ease;
+      transition: all 0.4s ease;
     }
 
     .prize-glow {
+      color: var(--current-border) !important;
       animation: prizeGlow 2.5s infinite ease-in-out;
+      transition: color 0.4s ease;
     }
 
     @keyframes prizeGlow {
-      0%, 100% { text-shadow: 0 0 5px rgba(2, 132, 199, 0.2); transform: scale(1); }
-      50% { text-shadow: 0 0 15px rgba(217, 119, 6, 0.5); transform: scale(1.02); }
+      0%, 100% { text-shadow: 0 0 5px rgba(0, 0, 0, 0.1); transform: scale(1); }
+      50% { text-shadow: 0 0 12px var(--current-theme); transform: scale(1.02); }
     }
 
     .prizes-info {
-      background: #f0f9ff;
-      border: 1px solid #bae6fd;
+      background: var(--current-bg-prizes);
+      border: 1px solid var(--current-border-prizes);
       border-radius: 12px;
       padding: 14px;
       margin-top: 15px;
       font-size: 0.88rem;
       text-align: left;
       line-height: 1.6;
+      transition: background 0.4s ease, border-color 0.4s ease;
     }
 
     /* BARRAS Y GRILLA */
@@ -198,7 +208,7 @@
     .legend-item { display: flex; align-items: center; gap: 6px; }
     .dot { width: 12px; height: 12px; border-radius: 50%; }
     .dot-green { background: var(--green); }
-    .dot-gold { background: var(--gold-light); }
+    .dot-gold { background: var(--current-theme); }
     .dot-red { background: var(--red); }
 
     .grid {
@@ -210,8 +220,8 @@
 
     .num {
       background: #ffffff;
-      border: 2px solid #38bdf8;
-      color: #0369a1;
+      border: 2px solid var(--current-border);
+      color: var(--text);
       padding: 14px 0;
       text-align: center;
       border-radius: 10px;
@@ -224,14 +234,14 @@
 
     .num:hover:not(.sold) {
       transform: translateY(-3px) scale(1.05);
-      border-color: var(--gold-light);
+      border-color: var(--current-theme);
     }
 
     .num.sel {
-      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      background: linear-gradient(135deg, var(--current-border), var(--current-theme));
       color: #fff;
-      border-color: var(--gold);
-      box-shadow: 0 0 12px rgba(217, 119, 6, 0.6);
+      border-color: var(--current-border);
+      box-shadow: 0 0 12px var(--current-theme);
       animation: pop 0.3s ease;
     }
 
@@ -267,13 +277,18 @@
       transition: all 0.2s ease;
     }
 
-    .btn-gold { background: var(--gold-light); color: #fff; }
-    .btn-gold:hover { background: var(--gold); }
+    .btn-gold { 
+      background: var(--current-theme); 
+      color: #fff; 
+      transition: background 0.3s ease;
+    }
+    .btn-gold:hover { opacity: 0.9; }
 
     .btn-out {
       background: #fff;
-      border: 2px solid var(--primary-blue);
-      color: var(--primary-blue);
+      border: 2px solid var(--current-border);
+      color: var(--current-border);
+      transition: all 0.3s ease;
     }
 
     /* FORMULARIO Y BOTÓN WHATSAPP */
@@ -291,13 +306,14 @@
 
     .payment-box {
       background: #f8fafc;
-      border: 1px dashed var(--primary-blue);
+      border: 1px dashed var(--current-border);
       padding: 12px;
       border-radius: 8px;
       margin-bottom: 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: border-color 0.4s ease;
     }
 
     .btn-copy {
@@ -356,7 +372,7 @@
   </div>
 
   <div class="card" id="main-card">
-    <h2 class="prize-glow" id="prize-title" style="color: var(--primary-blue); font-size: 1.4rem;">Gran Premio: $1'000.000 COP</h2>
+    <h2 class="prize-glow" id="prize-title" style="font-size: 1.4rem;">Gran Premio: $1'000.000 COP</h2>
     <p style="margin-top: 4px; font-size:0.95rem;" id="ticket-info">Valor Ticket: <strong>$20.000 COP</strong> | Lotería de Boyacá (Sábado)</p>
     
     <div class="prizes-info" id="prizes-details">
@@ -414,6 +430,9 @@
         title: "🥇 Sorteo Oro: $1'000.000 COP",
         ticketPrice: 20000,
         themeColor: "#f59e0b",
+        borderColor: "#d97706",
+        bgPrizes: "#fffbe3",
+        borderPrizes: "#fde68a",
         prizes: `
           <div>🥇 <strong>Primer Premio:</strong> $1'000.000 COP (2 últimas cifras del Premio Mayor)</div>
           <div>🥈 <strong>Segundo Premio:</strong> $100.000 COP (Número anterior al ganador)</div>
@@ -427,6 +446,9 @@
         title: "🥈 Sorteo Plata: $500.000 COP",
         ticketPrice: 10000,
         themeColor: "#94a3b8",
+        borderColor: "#475569",
+        bgPrizes: "#f1f5f9",
+        borderPrizes: "#cbd5e1",
         prizes: `
           <div>🥇 <strong>Primer Premio:</strong> $500.000 COP (2 últimas cifras del Premio Mayor)</div>
           <div>🥈 <strong>Segundo Premio:</strong> $50.000 COP (Número anterior al ganador)</div>
@@ -439,7 +461,10 @@
       bronce: {
         title: "🥉 Sorteo Bronce: $250.000 COP",
         ticketPrice: 5000,
-        themeColor: "#b45309",
+        themeColor: "#d97706",
+        borderColor: "#78350f",
+        bgPrizes: "#fff7ed",
+        borderPrizes: "#ffedd5",
         prizes: `
           <div>🥇 <strong>Primer Premio:</strong> $250.000 COP (2 últimas cifras del Premio Mayor)</div>
           <div>🥈 <strong>Segundo Premio:</strong> $25.000 COP (Número anterior al ganador)</div>
@@ -461,12 +486,17 @@
         btn.classList.toggle('active', btn.dataset.type === type);
       });
 
-      // Actualizar información del sorteo
+      // Actualizar información y temas cromáticos del sorteo
       const data = raffles[type];
       document.getElementById('prize-title').innerText = data.title;
       document.getElementById('ticket-info').innerHTML = `Valor Ticket: <strong>$${data.ticketPrice.toLocaleString('es-CO')} COP</strong> | Lotería de Boyacá (Sábado)`;
       document.getElementById('prizes-details').innerHTML = data.prizes;
+
+      // Variables CSS globales
       document.documentElement.style.setProperty('--current-theme', data.themeColor);
+      document.documentElement.style.setProperty('--current-border', data.borderColor);
+      document.documentElement.style.setProperty('--current-bg-prizes', data.bgPrizes);
+      document.documentElement.style.setProperty('--current-border-prizes', data.borderPrizes);
 
       renderGrid();
       update();
@@ -555,7 +585,9 @@
 
       const categoryName = currentRaffle.toUpperCase();
       const msg = `Hola Castillo del Año! 👋🏼%0AQuiero reservar para el *SORTEO ${categoryName}*%0ANombre: *${name}*%0ABoletos reservados: *${data.sel.join(', ')}*%0ATotal a pagar: *$${(data.sel.length * data.ticketPrice).toLocaleString('es-CO')} COP*`;
-      window.open(`https://wa.me/573115215251?text=${msg}`, '_blank');
+      
+      // WhatsApp 350 593 3518
+      window.open(`https://wa.me/573505933518?text=${msg}`, '_blank');
     }
 
     // Inicializar sorteo
